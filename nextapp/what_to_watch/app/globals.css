@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-gray-900 text-white font-sans;
+  }
+}
+
+@layer components {
+  .auth-layout input {
+    @apply block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-olive-300 sm:text-sm/6;
+  }
+
+  .auth-layout label {
+    @apply block text-sm/6 font-medium text-white;
+  }
+
+  .auth-layout button {
+    @apply flex w-full justify-center rounded-md bg-gray-600/50 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive-300;
+  }
+
+  .auth-layout h2 {
+    @apply mt-10 text-center text-2xl/9 font-bold tracking-tight text-white;
+  }
+
+  .auth-layout .err {
+    @apply mt-1 text-sm text-red-400;
+  }
+
+  .auth-layout a {
+    @apply font-semibold text-olive-400 hover:text-olive-300;
+  }
+
+  .searchBox button {
+    @apply flex w-full justify-center rounded-md bg-gray-600/50 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive-300;
+  }
+
+  .editMovie button {
+    @apply flex items-center w-full justify-center rounded-md bg-gray-600/50 md:px-3 md:py-1.5 text-sm/6 font-semibold text-white hover:bg-gray-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-olive-300;
+  }
+}
