@@ -41,7 +41,9 @@ export default function SearchBox({
 
     if (!query) {
       setFilteredMovies(null);
-      setPage(1);
+      if(page != 1) {
+        setPage(1);
+      }
       return;
     }
 
