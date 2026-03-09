@@ -12,21 +12,14 @@ import {
 } from "@/app/utils/listDb";
 import { verifySession } from "@/app/lib/dal";
 
-export async function searchAndAddMovies(query: string): Promise<PlainMovie[]> {
+export async function searchAndAddMovies(query: string, pageNumber?: number): Promise<PlainMovie[]> {
   const localMovies = await searchMovies(query);
-
   let apiMovies: Movie[] = [];
   if (localMovies.length < 5 && query.length > 1) {
-    const apiMoviesNoDedup = await searchApi(query);
+    const apiMoviesNoDedup = await searchApi(query, pageNumber);
     try {
-      const results = await Promise.allSettled(
-        apiMoviesNoDedup.map((movie) => setMovie(movie)),
-      );
-      apiMovies = results
-        .filter(
-          (r): r is PromiseFulfilledResult<Movie> => r.status === "fulfilled",
-        )
-        .map((r) => r.value);
+      await Promise.all(apiMoviesNoDedup.map((movie) => setMovie(movie)));
+      apiMovies = apiMoviesNoDedup.filter(m => !localMovies.some(l => l.id === m.id))
     } catch {}
   }
   const a = localMovies.map((m) => ({ ...m })).slice(0, 20);
@@ -40,7 +33,7 @@ export async function addMovieToList(
 ): Promise<{ message: string } | undefined> {
   const user = await verifySession();
   try {
-    addUserMovie(user.userId, movieId, list);
+    await addUserMovie(user.userId, movieId, list);
     revalidatePath("/");
   } catch {
     return { message: "Could not add movie" };

@@ -7,16 +7,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
 import { Button } from "@headlessui/react";
 import { removeMovieFromList, setUserList } from "@/app/actions/movies";
+import FailureModal from "@/components/ui/FailureModal";
+import { useState } from "react";
 
 export default function EditMovie(movie: PlainMovie) {
+  const [error, setError] = useState<string | undefined>(undefined);
   const router = useRouter();
   const searchParams = useSearchParams();
   return (
     <div className="editMovie relative flex 2xl:flex-row flex-col">
-      <div className="relative w-full 2xl:w-54 h-fit aspect-2/3 shrink-0">
+      <div className="relative w-full xl:w-40 2xl:w-54 h-fit aspect-2/3 shrink-0">
         <Image
           src={`https://media.themoviedb.org/t/p/w440_and_h660_face${movie?.poster_url}`}
           fill
+          loading="eager"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           alt={"Movie poster"}
         />
       </div>
@@ -51,25 +56,39 @@ export default function EditMovie(movie: PlainMovie) {
 
           <div className="flex gap-2 mt-4 w-full ">
             <Button
-              onClick={() => {
+              onClick={async () => {
                 const list =
                   movie.list == MovieLists.TO_WATCH
                     ? MovieLists.WATCHED
                     : MovieLists.TO_WATCH;
-                setUserList(movie.id, list);
-                const params = new URLSearchParams(searchParams.toString());
-                params.set("list", String(list));
-                router.push(`?${params.toString()}`);
+                const res = await setUserList(movie.id, list);
+                if (res?.message) {
+                  setError(res.message);
+                } else {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set("list", String(list));
+                  router.push(`?${params.toString()}`);
+                }
               }}
             >
               Change lists
             </Button>
+            {error && (
+              <FailureModal
+                message={error}
+                onClose={() => setError(undefined)}
+              />
+            )}
             <Button
-              onClick={() => {
-                removeMovieFromList(movie.id);
-                const params = new URLSearchParams(searchParams.toString());
-                params.delete("movie");
-                router.push(`?${params.toString()}`);
+              onClick={async () => {
+                const res = await removeMovieFromList(movie.id);
+                if (res?.message) {
+                  setError(res?.message);
+                } else {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.delete("movie");
+                  router.push(`?${params.toString()}`);
+                }
               }}
             >
               Remove movie

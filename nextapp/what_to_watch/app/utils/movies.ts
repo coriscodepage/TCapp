@@ -70,20 +70,14 @@ export async function searchMovies(title: string): Promise<Movie[]> {
   return movies;
 }
 
-export async function setMovie(movie: Movie): Promise<Movie> {
+export async function setMovie(movie: Movie) {
   if (!movie.id || !movie.title || movie.media_type === undefined) {
-    throw new AppError("Invalid movie data", "MOVIE_INVALID");
+    return;
   }
-  let entries = await sql`
+  await sql`
     insert into movies (id, title, director, release_date, rating, poster_url, media_type)
     values (${movie.id}, ${movie.title}, ${movie.director || null}, ${movie.release_date}, ${movie.rating}, ${movie.poster_url || null}, ${movie.media_type == MovieType.MOVIE ? true : false})
     on conflict (id) do nothing
     returning id;
   `;
-  let entry = entries.at(0);
-
-  if (!entry) {
-    throw new AppError("Could not insert movie", "MOVIE_INSERT_ERR");
-  }
-  return movie;
 }

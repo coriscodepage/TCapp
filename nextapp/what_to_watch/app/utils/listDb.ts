@@ -47,7 +47,6 @@ export async function addUserMovie(
     on conflict do nothing
     returning user_id
   `;
-
   if (!entries.at(0)) {
     throw new AppError("Could not add movie to list", "MOVIE_ASSOC_ADD_ERR");
   }

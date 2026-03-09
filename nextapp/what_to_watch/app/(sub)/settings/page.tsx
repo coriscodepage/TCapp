@@ -5,14 +5,15 @@ import { useActionState, useEffect, useState } from "react";
 import { EditUser, fetchCurrentUser } from "@/app/actions/auth";
 import { Button } from "@headlessui/react";
 import DeleteModal from "@/components/ui/DeleteModal";
-import { deleteUser } from "@/app/utils/users";
-import { User } from "@/app/utils/datatypes";
+import { DeleteUser } from "@/app/actions/auth";
+import FailureModal from "@/components/ui/FailureModal";
 
 export default function Page() {
   const [state, action, pending] = useActionState(EditUser, undefined);
   const [user, setUser] = useState<{ username: string; uuid: string } | null>(
     null,
   );
+  const [error, setError] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
@@ -20,13 +21,17 @@ export default function Page() {
     fetchCurrentUser()
       .then((user) => setUser({ username: user.username, uuid: user.uuid }))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [state]);
 
   if (isLoading)
     return <div className="flex flex-col h-screen">Loading...</div>;
 
   return (
     <div className="flex flex-col h-screen items-center">
+      {error && (
+        <FailureModal message={error} onClose={() => setError(undefined)} />
+      )}
+
       <section className="w-full">
         <SiteNav username={user?.username ?? ""} />
         <header className="relative bg-gray-800 after:pointer-events-none after:absolute after:inset-x-0 after:inset-y-0 after:border-y after:border-white/10">
@@ -90,7 +95,7 @@ export default function Page() {
           </p>
 
           <button disabled={pending} type="submit">
-            Sign Up
+            Save changes
           </button>
         </form>
 
@@ -102,8 +107,11 @@ export default function Page() {
         {open && (
           <DeleteModal
             message="Are you sure you want to delete your account?"
-            onConfirm={() => {
-              // user?.uuid && deleteUser(user?.uuid);
+            onConfirm={async () => {
+              if (user?.uuid) {
+                const res = await DeleteUser();
+                setError(res?.message);
+              }
               setOpen(false);
             }}
             onClose={() => setOpen(false)}

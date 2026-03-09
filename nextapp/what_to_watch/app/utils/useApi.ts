@@ -3,8 +3,9 @@ import { Movie, MovieType } from "@/app/utils/datatypes";
 
 export async function getMovieById(id: number) {}
 
-export async function searchApi(query: string): Promise<Movie[]> {
-  const url = `https://api.themoviedb.org/3/search/multi?query=${query}&include_adult=false&language=en-US&page=1`;
+export async function searchApi(query: string, pageNumber?: number): Promise<Movie[]> {
+  const url = `https://api.themoviedb.org/3/search/multi?query=${query}&include_adult=false&language=en-US&page=${pageNumber || 1}`;
+  console.log(url);
   const options = {
     method: "GET",
     headers: {

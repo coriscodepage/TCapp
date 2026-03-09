@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   AppError,
+  EditFormData,
   FullUser,
   SignupFormData,
   User,
@@ -82,6 +83,39 @@ export async function setNewUser(data: SignupFormData): Promise<FullUser> {
     return user;
   }
   throw new AppError("Could not create user", "USER_FREE_UUID_NOT_FOUND");
+}
+
+export async function editUserData(
+  user: User,
+  data: EditFormData,
+): Promise<User> {
+  const email = data.email || user.email;
+  const uname = data.name || user.username;
+  let entries;
+  if (data.password) {
+    const passwd_hash = await bcrypt.hash(data.password, 10);
+    entries = await sql`
+    update users
+    set email = ${email}, name = ${uname}, passwd_hash = ${passwd_hash}
+    where id = ${user.uuid}
+    returning id;
+  `;
+  } else {
+    entries = await sql`
+    update users
+    set email = ${email}, name = ${uname}
+    where id = ${user.uuid}
+    returning id;
+  `;
+  }
+
+  let entry = entries.at(0);
+
+  if (!entry) {
+    throw new AppError("User edit failes", "USER_EDIT_FAIL");
+  }
+
+  return new User(user.uuid, uname, email);
 }
 
 export async function deleteUser(id: string) {

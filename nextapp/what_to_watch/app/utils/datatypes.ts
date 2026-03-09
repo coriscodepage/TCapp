@@ -122,6 +122,14 @@ export const SignupFormSchema = z.object({
 
 export type SignupFormData = z.infer<typeof SignupFormSchema>;
 
+export const EditUserSchema = SignupFormSchema.partial().refine(
+  data => Object.values(data).some(v => v !== undefined),
+  { message: 'At least one field must be filled' }
+)
+
+export type EditFormData = z.infer<typeof EditUserSchema>;
+
+
 export const LoginFormSchema = z.object({
   email: z
     .email({

@@ -1,10 +1,16 @@
 "use server";
 
 import bcrypt, { compare } from "bcryptjs";
-import { deleteUser, getUser, getUserForLogin, setNewUser } from "@/app/utils/users";
+import {
+  deleteUser,
+  editUserData,
+  getUser,
+  getUserForLogin,
+  setNewUser,
+} from "@/app/utils/users";
 import { createSession, decrypt, deleteSession } from "@/app/lib/session";
 import {
-  FullUser,
+  EditUserSchema,
   LoginFormSchema,
   SignupFormSchema,
 } from "@/app/utils/datatypes";
@@ -35,7 +41,7 @@ export async function LoginUser(prevState: any, formData: FormData) {
   } catch {
     return { message: "Invalid email or password" };
   }
-  redirect('/');
+  redirect("/");
 }
 
 export async function UserSignup(prevState: any, formData: FormData) {
@@ -57,42 +63,51 @@ export async function UserSignup(prevState: any, formData: FormData) {
   } catch {
     return { message: "User creation failed" };
   }
-  redirect('/');
+  redirect("/");
 }
 
 export async function EditUser(prevState: any, formData: FormData) {
-  const validatedFields = SignupFormSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
+  const raw = {
+    name: formData.get("name") || undefined,
+    email: formData.get("email") || undefined,
+    password: formData.get("password") || undefined,
+  };
 
+  const validatedFields = EditUserSchema.safeParse(raw);
+  console.log(validatedFields.error?.message);
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
+      message: validatedFields.error.flatten().formErrors[0],
     };
   }
 
   try {
-    const user = await setNewUser(validatedFields.data);
+    const userCurrent = await getCurrentUser();
+    const user = await editUserData(userCurrent, validatedFields.data);
     await createSession(user.uuid, user.email);
   } catch {
-    return { message: "User creation failed" };
+    return { message: "User edit failed" };
   }
+  return { success: true };
 }
 
 export async function fetchCurrentUser() {
-  return {...(await getCurrentUser())};
+  return { ...(await getCurrentUser()) };
 }
 
 export async function UserLogout() {
-    await deleteSession();
-    redirect('/login');
+  await deleteSession();
+  redirect("/login");
 }
 
-export async function UserDelete() {
+export async function DeleteUser() {
   const user = await getCurrentUser();
-  await deleteUser(user.uuid);
-  await deleteSession();
-  redirect('/login');
+  try {
+    await deleteUser(user.uuid);
+    await deleteSession();
+    redirect("/login");
+  } catch {
+    return { message: "User delete failed" };
+  }
 }

@@ -5,6 +5,7 @@ import SearchBox from "@/components/ui/SearchBox";
 import EditMovie from "@/components/ui/EditMovieComp";
 import SiteNav from "@/components/ui/SiteNav";
 import { MovieLists } from "./utils/datatypes";
+import FailureModal from "@/components/ui/FailureModal";
 
 export default async function Page(props: {
   searchParams: Promise<{ movie?: string; list?: string }>;
@@ -31,7 +32,7 @@ export default async function Page(props: {
           </div>
         </div>
       </header>
-      <section className="flex min-h-0">
+      <section className="flex min-h-0 h-full">
         <main className="flex-1 overflow-y-scroll">
           <div>
             <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8 overflow-y-auto ">
@@ -40,7 +41,7 @@ export default async function Page(props: {
           </div>
         </main>
         {selectedMovie && (
-          <aside className="lg:w-1/4 max-w-1/3 p-2">
+          <aside className="lg:w-1/4 max-w-1/3 p-2 ">
             <EditMovie {...selectedMovie} />
           </aside>
         )}

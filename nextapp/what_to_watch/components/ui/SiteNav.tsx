@@ -12,7 +12,6 @@ const navigation = [
 ];
 
 export default function SiteNav({ username }: { username: string }) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentList = Number(searchParams.get("list") ?? MovieLists.TO_WATCH);
