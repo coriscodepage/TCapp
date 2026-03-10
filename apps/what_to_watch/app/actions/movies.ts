@@ -36,7 +36,7 @@ export async function addMovieToList(
     await addUserMovie(user.userId, movieId, list);
     revalidatePath("/");
   } catch {
-    return { message: "Could not add movie" };
+    return { message: "Could not add movie. It might be already added!" };
   }
 }
 

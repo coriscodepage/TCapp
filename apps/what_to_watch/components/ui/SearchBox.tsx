@@ -52,7 +52,7 @@ export default function SearchBox({
         const results = await searchAndAddMovies(query, page);
         setFilteredMovies(results);
       });
-    }, 400);
+    }, 600);
 
     return () => clearTimeout(timeoutRef.current);
   }, [query, page]);
@@ -93,7 +93,7 @@ export default function SearchBox({
               <MovieSmall {...movie} />
             </ComboboxOption>
           ))}
-          {filteredMovies && filteredMovies?.length < 5 && (
+          {filteredMovies && !isPending && filteredMovies?.length < 5 && (
             <Button
               className="px-4 py-2 w-full text-left cursor-pointer hover:bg-gray-500 rounded-md"
               disabled={page >= PAGE_LIMIT}
@@ -104,6 +104,7 @@ export default function SearchBox({
               {page >= PAGE_LIMIT ? "Can't load more" : "Load more..."}
             </Button>
           )}
+          {isPending && <span>Loading...</span>}
         </ComboboxOptions>
       </Combobox>
       {error && (
@@ -121,6 +122,7 @@ export default function SearchBox({
                   selectedList,
                 );
                 setError(res?.message);
+                res?.message || setSelectedMovie(null);
               }
             })
           }

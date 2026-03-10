@@ -24,6 +24,7 @@ export default function Movie(movie: PlainMovie) {
           width={200}
           height={200}
           alt={"Movie poster"}
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
         />
         <div className="relative bottom-4 left-1 sm:bottom-6 sm:left-4 size-5 sm:size-8 md:size-10">
           <Rating percentage={Math.round(movie.rating * 10)} />

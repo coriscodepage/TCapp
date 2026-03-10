@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [new URL('https://media.themoviedb.org/**')],
   },
+  output: "standalone",
 };
 
 
