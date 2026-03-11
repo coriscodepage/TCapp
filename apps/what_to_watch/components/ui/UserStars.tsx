@@ -30,6 +30,7 @@ export default function UserStars(movie: PlainMovie) {
         {[1, 2, 3, 4, 5].map((i) => (
           <svg
             key={i}
+            data-testid={`star-${i}`}
             className="w-5 h-5 cursor-pointer transition-transform hover:scale-110"
             xmlns="http://www.w3.org/2000/svg"
             fill={displayStars >= i ? FILLED : EMPTY}
